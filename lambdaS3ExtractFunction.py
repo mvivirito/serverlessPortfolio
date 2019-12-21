@@ -4,10 +4,10 @@ import boto3
 from io import BytesIO
 
 
-
-
 def lambda_handler(event, context):
     s3 = boto3.resource('s3')
+    sns = boto3.resource('sns')
+    topic = sns.Topic('arn:aws:sns:us-east-1:983784055278:DeployGloriaPortfolioTopic')
 
     gloriashulman_bucket = s3.Bucket('www.gloriashulman.info')
 
@@ -27,4 +27,5 @@ def lambda_handler(event, context):
             gloriashulman_bucket.upload_fileobj(obj, fileName, ExtraArgs={'ContentType': mimetypes.guess_type(fileName) [0]})
             gloriashulman_bucket.Object(fileName).Acl().put(ACL='public-read')
 
-    return 'Hello from Lambda!'
+    topic.publish(Message="Portfolio Deplyed!")
+    return 'Job Complete!'
